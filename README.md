@@ -151,12 +151,6 @@ pve_token_secret = "<secret>"
 
 ---
 
-## 🧪 TODO
-
-* [ ] Fix WireGuard configuration (split tunneling)
-* [ ] Check open ports and firewall rules on all nodes
-* [ ] Mount NFS from storage node to operations node
-
 ## 📜 License
 
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
