@@ -3,6 +3,9 @@ amnezia_proxy_dir: /opt/amnezia-proxy
 amnezia_proxy_image: "sub1g/amneziawg-socks5:latest"
 amnezia_proxy_container_name: amneziawg-socks5
 
+# Path the image reads the AmneziaWG config from (awg-quick interface awg0)
+amnezia_conf_mount: /etc/amnezia/amneziawg/awg0.conf
+
 # SOCKS5 listener
 amnezia_socks_port: 1080
 # Bind the SOCKS port to the host's LAN IP only (not 0.0.0.0)

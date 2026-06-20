@@ -9,6 +9,6 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
     volumes:
-      - ./awg.conf:/config/wg0.conf:ro
+      - ./awg.conf:{{ amnezia_conf_mount }}:ro
     ports:
       - "{{ amnezia_socks_bind_ip }}:{{ amnezia_socks_port }}:1080"
