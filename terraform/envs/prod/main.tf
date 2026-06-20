@@ -71,16 +71,15 @@ locals {
       firewall_enable = false
       firewall_rules  = []
     }
-  }
 
-  container_definitions = {
-    "ct-vpn" = {
-      hostname        = "ct-vpn"
+    "vm-vpn" = {
+      hostname        = "vm-vpn"
       cores           = 1
       memory          = 1024
       disk_size       = 10
       ipaddr          = "192.168.1.11/24"
-      nesting         = false
+      virtiofs        = []
+      pci_devices     = []
       firewall_enable = true
       firewall_rules = [
         {
@@ -104,7 +103,9 @@ locals {
         }
       ]
     }
+  }
 
+  container_definitions = {
     "ct-caddy" = {
       hostname        = "ct-caddy"
       cores           = 1
