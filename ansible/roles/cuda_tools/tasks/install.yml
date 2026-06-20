@@ -25,14 +25,18 @@
     deb: /var/tmp/cuda-keyring_1.1-1_all.deb
     state: present
 
+- name: Refresh apt cache after adding CUDA repository
+  ansible.builtin.apt:
+    update_cache: true
+
 - name: Install CUDA toolkit
   ansible.builtin.apt:
-    name: cuda-toolkit-13-2
+    name: cuda-toolkit-12-6
     state: present
 
 - name: Install Ubuntu NVIDIA driver
   ansible.builtin.apt:
-    name: nvidia-driver-535
+    name: nvidia-driver-580
     state: present
 
 - name: Enable persistence mode
