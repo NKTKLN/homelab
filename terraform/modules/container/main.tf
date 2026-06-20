@@ -1,8 +1,13 @@
 resource "proxmox_virtual_environment_container" "container" {
   # General
-  node_name    = var.node_name
+  node_name = var.node_name
   # Unprivileged containers improve security and are recommended for production
   unprivileged = true
+
+  # Container features (e.g. nesting for running nested containers/systemd)
+  features {
+    nesting = var.features_nesting
+  }
 
   startup {
     order      = 1

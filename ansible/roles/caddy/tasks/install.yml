@@ -1,0 +1,46 @@
+- name: Install Caddy repository prerequisites
+  ansible.builtin.apt:
+    name:
+      - debian-keyring
+      - debian-archive-keyring
+      - apt-transport-https
+      - curl
+      - gnupg
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Ensure apt keyrings dir
+  ansible.builtin.file:
+    path: /usr/share/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Download Caddy GPG key (asc)
+  ansible.builtin.get_url:
+    url: "{{ caddy_gpg_key_url }}"
+    dest: /usr/share/keyrings/caddy-stable.asc
+    mode: "0644"
+
+- name: Convert Caddy key to keyring (.gpg)
+  ansible.builtin.shell: |
+    set -euo pipefail
+    gpg --dearmor < /usr/share/keyrings/caddy-stable.asc > {{ caddy_keyring_path }}.tmp
+    install -m 0644 {{ caddy_keyring_path }}.tmp {{ caddy_keyring_path }}
+    rm -f {{ caddy_keyring_path }}.tmp
+  args:
+    executable: /bin/bash
+    creates: "{{ caddy_keyring_path }}"
+
+- name: Add Caddy APT repository
+  ansible.builtin.get_url:
+    url: "{{ caddy_repo_list_url }}"
+    dest: /etc/apt/sources.list.d/caddy-stable.list
+    mode: "0644"
+  register: caddy_repo_list
+
+- name: Install Caddy
+  ansible.builtin.apt:
+    name: caddy
+    state: present
+    update_cache: "{{ caddy_repo_list.changed }}"

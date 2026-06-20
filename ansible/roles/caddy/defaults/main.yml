@@ -1,0 +1,18 @@
+# Caddy APT repository (Cloudsmith)
+caddy_gpg_key_url: "https://dl.cloudsmith.io/public/caddy/stable/gpg.key"
+caddy_repo_list_url: "https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt"
+caddy_keyring_path: /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+
+# Caddyfile location
+caddy_config_path: /etc/caddy/Caddyfile
+
+# Reverse-proxy sites.
+# Each site maps a public domain to an upstream backend.
+#   domain   - public hostname served by Caddy (TLS auto-provisioned)
+#   upstream - backend address Caddy proxies to (host:port)
+#   encode   - response compression algorithms (optional)
+# Override in group_vars/host_vars with real domains.
+caddy_sites:
+  - domain: "vault.example.com"
+    upstream: "192.168.1.22:8080"
+    encode: "zstd gzip"

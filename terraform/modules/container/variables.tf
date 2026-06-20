@@ -58,6 +58,14 @@ variable "disk_image_id" {
   type        = string
 }
 
+# Features
+
+variable "features_nesting" {
+  description = "Enable the nesting feature (required for running nested containers or some systemd workloads)"
+  type        = bool
+  default     = false
+}
+
 # Network Configuration
 
 variable "network_bridge" {

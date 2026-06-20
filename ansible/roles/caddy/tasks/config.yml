@@ -1,0 +1,15 @@
+- name: Deploy Caddyfile
+  ansible.builtin.template:
+    src: Caddyfile.j2
+    dest: "{{ caddy_config_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+    validate: "caddy validate --adapter caddyfile --config %s"
+  notify: reload caddy
+
+- name: Ensure Caddy is enabled and running
+  ansible.builtin.service:
+    name: caddy
+    state: started
+    enabled: true

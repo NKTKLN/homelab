@@ -1,0 +1,12 @@
+- name: Ensure Debian family
+  ansible.builtin.assert:
+    that: ansible_facts.os_family == "Debian"
+    fail_msg: "This role supports only Debian/Ubuntu."
+
+- name: Install Caddy
+  ansible.builtin.import_tasks: install.yml
+  tags: [caddy, install]
+
+- name: Configure Caddy
+  ansible.builtin.import_tasks: config.yml
+  tags: [caddy, config]

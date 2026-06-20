@@ -1,0 +1,8 @@
+# {{ ansible_managed }}
+{% for site in caddy_sites %}
+{{ site.domain }} {
+    encode {{ site.encode | default('zstd gzip') }}
+
+    reverse_proxy {{ site.upstream }}
+}
+{% endfor %}

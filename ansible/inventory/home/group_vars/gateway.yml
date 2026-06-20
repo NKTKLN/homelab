@@ -1,0 +1,6 @@
+# Reverse-proxy sites served by Caddy on the gateway container.
+# Replace the example domain/upstream with real values.
+caddy_sites:
+  - domain: "vault.example.com"
+    upstream: "192.168.1.22:8080"
+    encode: "zstd gzip"
