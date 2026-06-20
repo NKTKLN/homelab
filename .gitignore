@@ -101,7 +101,12 @@ tmp.*
 *.token
 *.key
 *.pem
-sensitive/
+
+# Sensitive data — keep the folder structure and *.example templates,
+# but never commit the real secret files.
+sensitive/**
+!sensitive/**/
+!sensitive/**/*.example
 
 # ========================
 # Custom ignore rules

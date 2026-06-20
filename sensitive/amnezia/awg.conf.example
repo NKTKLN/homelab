@@ -1,0 +1,39 @@
+# =====================================================================
+#  AmneziaWG client config  ->  mounted into the container as /config/wg0.conf
+# =====================================================================
+#  Copy this file to `awg.conf` (same folder) and replace the placeholders
+#  with the config exported from the Amnezia app:
+#    Amnezia -> your server -> Share / "..." -> AmneziaWG -> Export config
+#
+#  Unlike plain WireGuard, the [Interface] section carries extra obfuscation
+#  parameters: Jc, Jmin, Jmax, S1, S2, H1, H2, H3, H4. They MUST match the
+#  server settings, otherwise the tunnel will not come up.
+# ---------------------------------------------------------------------
+
+[Interface]
+# client private key (from the Amnezia export)
+PrivateKey = CHANGE_ME_PRIVATE_KEY
+# client address inside the VPN
+Address = 10.8.1.2/32
+DNS = 1.1.1.1, 1.0.0.1
+
+# --- AmneziaWG obfuscation (values come from the server config) ---
+Jc = 4
+Jmin = 40
+Jmax = 70
+S1 = 0
+S2 = 0
+H1 = 1
+H2 = 2
+H3 = 3
+H4 = 4
+
+[Peer]
+# server public key
+PublicKey = CHANGE_ME_SERVER_PUBLIC_KEY
+# PresharedKey = CHANGE_ME_PSK   # if used
+# your AmneziaWG server address:port
+Endpoint = CHANGE_ME_SERVER_IP:CHANGE_ME_PORT
+# route all traffic through the tunnel
+AllowedIPs = 0.0.0.0/0, ::/0
+PersistentKeepalive = 25
