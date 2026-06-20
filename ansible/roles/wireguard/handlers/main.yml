@@ -1,4 +1,5 @@
-- name: restart wireguard
-  ansible.builtin.systemd:
-    name: "wg-quick@{{ wireguard_interface }}"
-    state: restarted
+- name: restart wg-easy
+  ansible.builtin.command:
+    cmd: docker compose up -d --force-recreate
+    chdir: "{{ wireguard_dir }}"
+  changed_when: true

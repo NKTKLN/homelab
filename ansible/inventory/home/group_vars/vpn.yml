@@ -2,10 +2,13 @@
 sysctl_settings:
   net.ipv4.ip_forward: 1
 
+# wg-easy (WireGuard with web UI)
 wireguard_endpoint: "192.168.1.11"
-wireguard_local_network: "192.168.1.0/24"
-wireguard_network: "10.10.10.0/24"
-wireguard_server_address: "10.10.10.1/24"
-wireguard_peer_address: "10.10.10.10/32"
+wireguard_client_address_range: "10.10.10.x"
 wireguard_dns: "1.1.1.1"
-wireguard_fetch_enabled: true
+wireguard_lan_cidr: "192.168.1.0/24"
+
+# Web UI admin password hash (bcrypt). Generate with:
+#   docker run --rm ghcr.io/wg-easy/wg-easy:14 wgpw 'your-password'
+# Prefer ansible-vault / host_vars over committing the real hash.
+wireguard_password_hash: ""

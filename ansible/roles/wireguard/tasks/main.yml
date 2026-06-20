@@ -3,35 +3,69 @@
     that: ansible_facts.os_family == "Debian"
     fail_msg: "This role supports only Debian/Ubuntu."
 
-- name: Install and prepare WireGuard
-  ansible.builtin.import_tasks: install.yml
-  tags: [vpn, install]
+- name: Ensure WireGuard endpoint is set
+  ansible.builtin.assert:
+    that: wireguard_endpoint | length > 0
+    fail_msg: "wireguard_endpoint must be set (public host/IP clients connect to)."
 
-- name: Generate server keys
-  ansible.builtin.import_tasks: generate_keypair.yml
-  vars:
-    wireguard_key_dir: "{{ wireguard_config_dir }}"
-    wireguard_private_key_dest: "{{ wireguard_private_key_path }}"
-    wireguard_public_key_dest: "{{ wireguard_public_key_path }}"
-    wireguard_private_key_fact: wireguard_private_key
-    wireguard_public_key_fact: wireguard_public_key
-  tags: [vpn, keys]
+- name: Ensure web UI password hash is set
+  ansible.builtin.assert:
+    that: wireguard_password_hash | length > 0
+    fail_msg: >-
+      wireguard_password_hash must be set. Generate one with:
+      docker run --rm {{ wireguard_image }} wgpw 'your-password'
 
-- name: Generate peer keys
-  ansible.builtin.import_tasks: generate_keypair.yml
-  vars:
-    wireguard_key_dir: "{{ wireguard_peer_dir }}"
-    wireguard_private_key_dest: "{{ wireguard_peer_private_key_path }}"
-    wireguard_public_key_dest: "{{ wireguard_peer_public_key_path }}"
-    wireguard_private_key_fact: wireguard_peer_private_key
-    wireguard_public_key_fact: wireguard_peer_public_key
-  tags: [vpn, peer_keys]
+- name: Ensure TUN kernel module is loaded
+  community.general.modprobe:
+    name: tun
+    state: present
+    persistent: present
 
-- name: Deploy WireGuard configs
-  ansible.builtin.import_tasks: config.yml
-  tags: [vpn, config]
+- name: Ensure project directory
+  ansible.builtin.file:
+    path: "{{ wireguard_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
 
-- name: Fetch peer configs
-  ansible.builtin.import_tasks: fetch_config.yml
-  when: wireguard_fetch_enabled | bool
-  tags: [vpn, fetch_config]
+- name: Ensure WireGuard config directory
+  ansible.builtin.file:
+    path: "{{ wireguard_dir }}/config"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+
+- name: Deploy docker-compose.yml
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ wireguard_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0640"
+  notify: restart wg-easy
+
+- name: Ensure wg-easy is running
+  ansible.builtin.command:
+    cmd: docker compose up -d
+    chdir: "{{ wireguard_dir }}"
+  register: wireguard_compose
+  changed_when: >-
+    ('Started' in wireguard_compose.stderr)
+    or ('Created' in wireguard_compose.stderr)
+    or ('Recreated' in wireguard_compose.stderr)
+
+- name: Allow WireGuard UDP port from LAN
+  community.general.ufw:
+    rule: allow
+    src: "{{ wireguard_lan_cidr }}"
+    port: "{{ wireguard_port }}"
+    proto: udp
+
+- name: Allow web UI port from LAN
+  community.general.ufw:
+    rule: allow
+    src: "{{ wireguard_lan_cidr }}"
+    port: "{{ wireguard_ui_port }}"
+    proto: tcp

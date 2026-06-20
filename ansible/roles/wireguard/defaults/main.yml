@@ -1,24 +1,35 @@
-wireguard_interface: wg0
-wireguard_port: 51820
+# wg-easy — WireGuard with a web UI (runs as a Docker container)
+wireguard_dir: /opt/wg-easy
+wireguard_image: "ghcr.io/wg-easy/wg-easy:14"
+wireguard_container_name: wg-easy
 
-# Set in group_vars/host_vars
+# Public endpoint clients connect to (set in group_vars/host_vars)
 wireguard_endpoint: ""
 
-wireguard_local_network: "192.168.1.0/24"
-wireguard_network: "10.10.10.0/24"
-wireguard_server_address: "10.10.10.1/24"
-wireguard_peer_address: "10.10.10.10/32"
+# WireGuard UDP port (advertised to clients and published on the host)
+wireguard_port: 51820
+# Web UI TCP port
+wireguard_ui_port: 51821
+# Bind the web UI to the host's LAN IP only (not 0.0.0.0)
+wireguard_ui_bind_ip: "{{ ansible_host }}"
 
+# Client IP address range. The "x" is replaced per client by wg-easy.
+wireguard_client_address_range: "10.10.10.x"
+# DNS pushed to clients
 wireguard_dns: "1.1.1.1"
+# Default AllowedIPs for generated clients (full tunnel)
+wireguard_allowed_ips: "0.0.0.0/0, ::/0"
+# PersistentKeepalive (seconds) for generated clients
+wireguard_keepalive: 25
+# Tunnel MTU
+wireguard_mtu: 1420
+# Show per-client traffic statistics in the web UI
+wireguard_ui_traffic_stats: true
 
-wireguard_config_dir: /etc/wireguard
-wireguard_peer_dir: /etc/wireguard/peer
+# Web UI admin password as a bcrypt hash. Generate with:
+#   docker run --rm ghcr.io/wg-easy/wg-easy:14 wgpw 'your-password'
+# Keep the real hash out of git (vault / host_vars).
+wireguard_password_hash: ""
 
-wireguard_private_key_path: "{{ wireguard_config_dir }}/private.key"
-wireguard_public_key_path: "{{ wireguard_config_dir }}/public.key"
-
-wireguard_peer_private_key_path: "{{ wireguard_peer_dir }}/private.key"
-wireguard_peer_public_key_path: "{{ wireguard_peer_dir }}/public.key"
-
-wireguard_fetch_enabled: false
-wireguard_fetch_dir: "{{ playbook_dir }}/../../sensitive/wg_config"
+# Restrict inbound access to the WireGuard + web UI ports to this network
+wireguard_lan_cidr: "192.168.1.0/24"

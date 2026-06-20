@@ -30,6 +30,11 @@
   hosts: vpn
   become: true
   tasks:
+    - name: Apply docker role
+      ansible.builtin.import_role:
+        name: docker
+      tags: [docker]
+
     - name: Apply wireguard role
       ansible.builtin.import_role:
         name: wireguard
