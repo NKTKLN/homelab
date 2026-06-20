@@ -1,5 +1,0 @@
-- ansible.builtin.import_tasks: mount.yml
-  tags: [virtiofs, mount]
-
-- ansible.builtin.import_tasks: ownership.yml
-  tags: [virtiofs, ownership]

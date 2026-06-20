@@ -1,7 +1,0 @@
-- name: Set ownership for VirtioFS source directory
-  ansible.builtin.file:
-    path: "{{ virtiofs_mount_path }}"
-    owner: "{{ virtiofs_owner }}"
-    group: "{{ virtiofs_group }}"
-    mode: "{{ virtiofs_mode }}"
-    recurse: yes
