@@ -41,9 +41,9 @@ resource "proxmox_virtual_environment_vm" "vm" {
     datastore_id = var.disk_storage
     # import_from pulls an existing qcow2 image into Proxmox storage
     # Typically used together with cloud-init images
-    import_from  = var.disk_image_id
-    size         = var.disk_size
-    interface    = "scsi0"
+    import_from = var.disk_image_id
+    size        = var.disk_size
+    interface   = "scsi0"
   }
 
   dynamic "virtiofs" {
@@ -75,7 +75,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
   network_device {
     bridge = var.network_bridge
     # Using virtio network interface for better performance on Linux guests
-    model  = "virtio"
+    model = "virtio"
   }
 
   # Cloud-init

@@ -24,10 +24,10 @@ module "ubuntu_lxc_image" {
 
 locals {
   vm_definitions = {
-    "vm-sandbox" = {
-      hostname        = "vm-sandbox"
+    "vm-node-1" = {
+      hostname        = "vm-node-1"
       cores           = 2
-      memory          = 2048
+      memory          = 4096
       disk_size       = 20
       ipaddr          = "192.168.1.12/24"
       virtiofs        = []
@@ -39,69 +39,33 @@ locals {
     "vm-ops-node" = {
       hostname        = "vm-ops-node"
       cores           = 2
-      memory          = 3072
+      memory          = 2048
       disk_size       = 20
       ipaddr          = "192.168.1.13/24"
       virtiofs        = []
       pci_devices     = []
       firewall_enable = false
-      firewall_rules = []
-    }
-
-    "vm-storage-node" = {
-      hostname        = "vm-storage-node"
-      cores           = 2
-      memory          = 4096
-      disk_size       = 32
-      ipaddr          = "192.168.1.14/24"
-      virtiofs        = var.virtiofs
-      pci_devices     = []
-      firewall_enable = false
       firewall_rules  = []
     }
 
-    "vm-k8s-master-1" = {
-      hostname        = "vm-k8s-master-1"
+    "vm-gpu-worker-1" = {
+      hostname        = "vm-gpu-worker-1"
       cores           = 4
       memory          = 4096
-      disk_size       = 40
-      ipaddr          = "192.168.1.15/24"
-      virtiofs        = []
-      pci_devices     = []
-      firewall_enable = false
-      firewall_rules  = []
-    }
-
-    "vm-k8s-worker-1" = {
-      hostname        = "vm-k8s-worker-1"
-      cores           = 4
-      memory          = 6144
-      disk_size       = 40
-      ipaddr          = "192.168.1.16/24"
-      virtiofs        = []
-      pci_devices     = []
-      firewall_enable = false
-      firewall_rules  = []
-    }
-
-    "vm-k8s-gpu-worker-1" = {
-      hostname        = "vm-k8s-gpu-worker-1"
-      cores           = 4
-      memory          = 6144
       disk_size       = 60
-      ipaddr          = "192.168.1.17/24"
+      ipaddr          = "192.168.1.14/24"
       virtiofs        = []
       pci_devices     = var.pci_devices
       firewall_enable = false
       firewall_rules  = []
     }
 
-    "vm-docker-worker" = {
-      hostname        = "vm-docker-worker"
-      cores           = 4
-      memory          = 4096
-      disk_size       = 40
-      ipaddr          = "192.168.1.18/24"
+    "vm-amnezia-proxy" = {
+      hostname        = "vm-amnezia-proxy"
+      cores           = 1
+      memory          = 1024
+      disk_size       = 16
+      ipaddr          = "192.168.1.20/24"
       virtiofs        = []
       pci_devices     = []
       firewall_enable = false
@@ -116,6 +80,7 @@ locals {
       memory          = 1024
       disk_size       = 10
       ipaddr          = "192.168.1.11/24"
+      nesting         = false
       firewall_enable = true
       firewall_rules = [
         {
@@ -131,6 +96,44 @@ locals {
           proto   = "udp"
           dport   = "51820"
           comment = "Allow Wireguard"
+        },
+        {
+          action  = "DROP"
+          type    = "in"
+          comment = "Drop all other incoming traffic"
+        }
+      ]
+    }
+
+    "ct-caddy" = {
+      hostname        = "caddy-gateway"
+      cores           = 1
+      memory          = 512
+      disk_size       = 8
+      ipaddr          = "192.168.1.15/24"
+      nesting         = true
+      firewall_enable = true
+      firewall_rules = [
+        {
+          action  = "ACCEPT"
+          type    = "in"
+          proto   = "tcp"
+          dport   = "22"
+          comment = "Allow SSH"
+        },
+        {
+          action  = "ACCEPT"
+          type    = "in"
+          proto   = "tcp"
+          dport   = "80"
+          comment = "Allow HTTP"
+        },
+        {
+          action  = "ACCEPT"
+          type    = "in"
+          proto   = "tcp"
+          dport   = "443"
+          comment = "Allow HTTPS"
         },
         {
           action  = "DROP"
@@ -196,6 +199,9 @@ module "container" {
   disk_size     = each.value.disk_size
   disk_storage  = var.disk_storage
   disk_image_id = module.ubuntu_lxc_image.image_id
+
+  # Features
+  features_nesting = each.value.nesting
 
   # Network
   ipaddr      = each.value.ipaddr

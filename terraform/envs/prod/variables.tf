@@ -89,22 +89,6 @@ variable "locale" {
   default     = "en_US.UTF-8"
 }
 
-# VirtioFS Shared Directories
-
-variable "virtiofs" {
-  description = "List of VirtioFS shared directories for the storage VM"
-  type = list(object({
-    # Required
-    name = string
-    path = string
-
-    # Optional
-    node    = optional(string)
-    comment = optional(string)
-  }))
-  default = []
-}
-
 # Shared PCI
 
 variable "pci_devices" {
