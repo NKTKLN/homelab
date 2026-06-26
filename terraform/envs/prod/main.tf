@@ -28,7 +28,7 @@ locals {
       hostname        = "vm-node-1"
       cores           = 2
       memory          = 4096
-      disk_size       = 20
+      disk_size       = 64
       ipaddr          = "192.168.1.12/24"
       virtiofs        = []
       pci_devices     = []
@@ -51,8 +51,8 @@ locals {
     "vm-gpu-worker-1" = {
       hostname        = "vm-gpu-worker-1"
       cores           = 4
-      memory          = 8196
-      disk_size       = 60
+      memory          = 16384
+      disk_size       = 128
       ipaddr          = "192.168.1.14/24"
       virtiofs        = []
       pci_devices     = var.pci_devices
